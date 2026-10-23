@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#5b21b6">
+<title>لوحة إدارة دفتر درجاتي</title>
+<style>
+:root{--purple:#5b21b6;--purple2:#7c3aed;--ink:#1f2340;--muted:#70758a;--line:#e6e3f2;--bg:#f6f4fb;--white:#fff;--green:#087443;--red:#b42318}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Tahoma,Arial,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer;border:0;border-radius:11px;padding:11px 15px;font-weight:700;background:var(--purple);color:#fff}
+button.secondary{background:#f0eafe;color:var(--purple);border:1px solid #e1d4ff}
+button:disabled{opacity:.55;cursor:not-allowed}
+.top{background:linear-gradient(120deg,#3b167f,#6d28d9 60%,#8b5cf6);color:white;padding:24px 18px 34px}
+.top-inner,.main{max-width:1120px;margin:auto}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:46px;height:46px;border-radius:14px;background:#ffffff22;display:grid;place-items:center;font-size:25px;border:1px solid #ffffff44}
+h1{font-size:clamp(21px,4vw,30px);margin:0 0 7px}
+.subtitle{margin:0;color:#eee7ff;font-size:13px}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+.top-actions button{background:#ffffff1c;border:1px solid #ffffff55}
+.main{padding:0 14px 30px;margin-top:-16px}
+.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:15px;box-shadow:0 5px 18px #30206008}
+.login{max-width:460px;margin:34px auto}
+label{display:block;font-size:13px;color:#5f647a;margin-bottom:7px}
+input{width:100%;padding:12px;border:1px solid #ded9ed;border-radius:10px;background:white;color:var(--ink);outline:none}
+input:focus{border-color:#8b5cf6;box-shadow:0 0 0 3px #8b5cf622}
+.field{margin:12px 0}
+.message{font-size:13px;background:#f2edff;color:#4c1d95;padding:10px 12px;border-radius:10px;min-height:18px}
+.message.error{background:#fff0ef;color:var(--red)}
+.hidden{display:none!important}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:15px}
+.stat{background:white;border:1px solid var(--line);border-radius:16px;padding:17px}
+.stat .label{color:var(--muted);font-size:12px;margin-bottom:9px}
+.stat .num{font-size:28px;font-weight:800;color:var(--purple)}
+.stat .hint{font-size:11px;color:var(--muted);margin-top:6px}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+h2{font-size:18px;margin:0}
+.search-row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.search-row input{flex:1;min-width:180px}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th,td{padding:13px 12px;text-align:right;border-bottom:1px solid #efedf6;font-size:13px}
+th{background:#faf9fe;color:#6c6580;font-size:12px;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#fcfbff}
+.email{font-weight:700;direction:ltr;text-align:right;unicode-bidi:plaintext}
+.pill{display:inline-block;border-radius:30px;padding:5px 9px;font-size:11px;background:#eee8ff;color:#5b21b6}
+.empty{text-align:center;color:var(--muted);padding:25px}
+.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.detail-item{background:#faf9fe;border:1px solid var(--line);border-radius:12px;padding:12px}
+.detail-item .k{font-size:11px;color:var(--muted);margin-bottom:7px}
+.detail-item .v{font-size:14px;font-weight:700;overflow-wrap:anywhere}
+.note{font-size:12px;color:var(--muted);line-height:1.8}
+footer{text-align:center;font-size:11px;color:#8b8ca0;padding:10px}
+@media(max-width:650px){.stats{grid-template-columns:1fr}.stat{display:flex;align-items:center;justify-content:space-between;gap:12px}.stat .num{font-size:24px}.detail-grid{grid-template-columns:1fr}.top{padding:18px 14px 30px}.panel{padding:14px}.main{padding-inline:10px}}
+/* Premium Purple visual refresh — presentation only; app logic and data keys unchanged */
+:root{--p:#4b247c;--purple:#4b247c;--purple2:#7650a8;--bg:#f7f4fb;--ink:#251a35;--line:#e8e0f1;--muted:#796d88}
+body{background:radial-gradient(ellipse at top right,#f0e8fa 0,transparent 42%),var(--bg);color:var(--ink);letter-spacing:0}
+button,input,select,textarea{font-family:inherit}
+button{border-radius:12px;transition:transform .16s ease,box-shadow .16s ease,background .16s ease}
+button:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 7px 18px #4b247c20}
+input,select,textarea{border:1px solid #ded3eb!important;border-radius:12px!important;background:#fff;min-height:42px;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:#8a65b4!important;box-shadow:0 0 0 3px #7650a81c!important}
+.panel,.card,.stat,.detail-item,.preview-sheet{border:1px solid #e8e0f1!important;border-radius:18px!important;box-shadow:0 8px 28px #35204d0b!important}
+.panel{background:rgba(255,255,255,.96)}
+header,.top{background:linear-gradient(125deg,#291442 0%,#4b247c 48%,#7650a8 100%)!important;color:#fff;box-shadow:0 12px 32px #351b5426}
+header{border-radius:0 0 28px 28px!important}
+header h1,.top h1{letter-spacing:-.4px}
+.stat,.detail-item{background:linear-gradient(145deg,#fff,#fbf8ff)!important}
+.stat .num{color:#4b247c!important}
+th{background:#f3edf9!important;color:#59466f!important}
+tbody tr:hover{background:#faf6ff!important}
+.pill{background:#eee5f8!important;color:#4b247c!important}
+button.secondary{background:#f3edf9!important;color:#4b247c!important;border:1px solid #e2d5ef!important}
+button.danger{background:#fff0f0!important;color:#a32632!important;border:1px solid #f3d4d7!important}
+.logo{box-shadow:0 8px 20px #20102f30}
+@media(max-width:650px){.wrap,.main{padding-inline:12px}.panel{padding:15px!important}header{padding:22px 15px 27px!important}button{min-height:42px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<section id="loginScreen" class="panel login">
+  <div class="brand" style="margin-bottom:18px">
+    <div class="logo" style="background:linear-gradient(120deg,#5b21b6,#8b5cf6);color:white">✦</div>
+    <div><h1 style="font-size:23px;color:#4c1d95">دفتر درجاتي</h1><p class="subtitle" style="color:#77718c">لوحة إدارة المدرّسين</p></div>
+  </div>
+  <p class="note">سجّل الدخول بحساب الأدمن المصرّح له فقط.</p>
+  <div class="field"><label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="username" placeholder="admin@example.com"></div>
+  <div class="field"><label for="password">كلمة المرور</label><input id="password" type="password" autocomplete="current-password" placeholder="كلمة المرور"></div>
+  <button id="loginBtn" style="width:100%;margin:6px 0 12px">تسجيل الدخول</button>
+  <div id="loginMessage" class="message" role="status">أدخل بيانات حساب الأدمن.</div>
+</section>
+
+<div id="dashboard" class="hidden">
+  <header class="top"><div class="top-inner">
+    <div class="topline">
+      <div class="brand"><div class="logo">✦</div><div><h1>لوحة إدارة دفتر درجاتي</h1><p class="subtitle">إدارة ومتابعة حسابات المدرّسين</p></div></div>
+      <div class="top-actions"><button id="refreshBtn">↻ تحديث البيانات</button><button id="logoutBtn">تسجيل الخروج</button></div>
+    </div>
+  </div></header>
+  <main class="main">
+    <div class="stats">
+      <div class="stat"><div><div class="label">إجمالي حسابات المدرّسين</div><div class="hint">الحسابات المسجلة في قاعدة البيانات</div></div><div id="totalCount" class="num">—</div></div>
+      <div class="stat"><div><div class="label">حسابات تحتوي بيانات دفتر</div><div class="hint">لديها طلاب أو حقول أو درجات محفوظة</div></div><div id="activeCount" class="num">—</div></div>
+      <div class="stat"><div><div class="label">آخر تحديث</div><div class="hint">أحدث وقت حفظ مسجل</div></div><div id="latestUpdate" class="num" style="font-size:16px">—</div></div>
+    </div>
+    <section class="panel">
+      <div class="section-title"><h2>حسابات المدرّسين</h2><span id="loadStatus" class="pill">بانتظار التحميل</span></div>
+      <div class="search-row"><input id="search" type="search" placeholder="ابحث بالبريد الإلكتروني..." aria-label="البحث عن مدرّس"><button id="clearSearch" class="secondary">مسح البحث</button></div>
+      <div class="table-wrap"><table><thead><tr><th>البريد الإلكتروني</th><th>عدد الطلاب</th><th>عدد حقول الدرجات</th><th>آخر تحديث</th><th>التفاصيل</th></tr></thead><tbody id="teachersBody"><tr><td colspan="5" class="empty">سجّل الدخول لتحميل الحسابات.</td></tr></tbody></table></div>
+      <p class="note">هذه اللوحة للعرض والمتابعة فقط؛ لا تعدّل درجات المدرّسين أو بياناتهم.</p>
+    </section>
+    <section id="detailPanel" class="panel hidden">
+      <div class="section-title"><h2>تفاصيل الحساب</h2><button id="closeDetail" class="secondary">إغلاق التفاصيل</button></div>
+      <div id="detailContent" class="detail-grid"></div>
+    </section>
+    <footer>دفتر درجاتي · لوحة إدارة مستقلة</footer>
+  </main>
+</div>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const firebaseConfig={
+ apiKey:'AIzaSyBRTvRGBdsZBQprCcuPTDeuVX-UePGyYXQ',
+ authDomain:'daftar-darajati.firebaseapp.com',
+ projectId:'daftar-darajati',
+ storageBucket:'daftar-darajati.firebasestorage.app',
+ messagingSenderId:'187711517936',
+ appId:'1:187711517936:web:63b22637601a1ed6163e35'
+};
+let auth,cloud,allTeachers=[],currentUser=null,loadSequence=0;
+function setLoginMessage(msg,error=false){$('loginMessage').textContent=msg;$('loginMessage').classList.toggle('error',error)}
+function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function dateOf(value){try{if(value&&typeof value.toDate==='function')return value.toDate()}catch(_){}return null}
+function dateText(value){const d=dateOf(value);return d?d.toLocaleString('ar-IQ'):'—'}
+function dataStats(record){const data=record.data&&typeof record.data==='object'?record.data:{};const students=Array.isArray(data.students)?data.students.length:0;const fields=Array.isArray(data.fields)?data.fields.length:0;const grades=data.grades&&typeof data.grades==='object'?Object.values(data.grades).reduce((n,row)=>n+(row&&typeof row==='object'?Object.keys(row).length:0),0):0;return {students,fields,grades,hasData:students>0||fields>0||grades>0,school:data.meta?.school||'',teacher:data.meta?.teacher||'',grade:data.meta?.grade||'',month:data.meta?.month||''}}
+function renderTable(){
+ const query=$('search').value.trim().toLocaleLowerCase();
+ const filtered=allTeachers.filter(t=>(t.email||'').toLocaleLowerCase().includes(query));
+ $('teachersBody').innerHTML=filtered.length?filtered.map(t=>{const s=dataStats(t);return `<tr><td class="email">${escapeHtml(t.email||'بدون بريد مسجل')}</td><td>${s.students}</td><td>${s.fields}</td><td>${escapeHtml(dateText(t.updatedAt))}</td><td><button class="secondary detail-btn" data-uid="${escapeHtml(t.uid)}">عرض</button></td></tr>`}).join(''):'<tr><td colspan="5" class="empty">ماكو نتائج مطابقة للبحث.</td></tr>';
+ $('teachersBody').querySelectorAll('.detail-btn').forEach(btn=>btn.addEventListener('click',()=>showDetails(btn.dataset.uid)));
+}
+function showDetails(uid){
+ const t=allTeachers.find(x=>x.uid===uid);if(!t)return;
+ const s=dataStats(t);
+ const entries=[
+ ['البريد الإلكتروني',t.email||'غير متوفر'],['معرّف الحساب',t.uid],['آخر تحديث',dateText(t.updatedAt)],
+ ['اسم المدرّس',s.teacher||'غير محدد'],['المدرسة',s.school||'غير محددة'],['الصف / الشعبة',s.grade||'غير محدد'],
+ ['الشهر المحدد',s.month||'غير محدد'],['عدد الطلاب',s.students],['عدد حقول الدرجات',s.fields],['عدد قيم الدرجات المحفوظة',s.grades],
+ ['حالة البيانات',s.hasData?'توجد بيانات دفتر':'لا توجد بيانات دفتر ظاهرة']
+ ];
+ $('detailContent').innerHTML=entries.map(([k,v])=>`<div class="detail-item"><div class="k">${escapeHtml(k)}</div><div class="v">${escapeHtml(v)}</div></div>`).join('');
+ $('detailPanel').classList.remove('hidden');$('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function loadTeachers(){
+ if(!currentUser)return;
+ const seq=++loadSequence;
+ $('loadStatus').textContent='جارٍ تحميل البيانات...';
+ $('teachersBody').innerHTML='<tr><td colspan="5" class="empty">جارٍ التحميل...</td></tr>';
+ try{
+  const snapshot=await cloud.collection('teachers').get();
+  if(seq!==loadSequence)return;
+  allTeachers=snapshot.docs.map(doc=>{const d=doc.data()||{};return {uid:doc.id,email:d.email||'',data:d.data||{},updatedAt:d.updatedAt||null}});
+  $('totalCount').textContent=allTeachers.length;
+  $('activeCount').textContent=allTeachers.filter(t=>dataStats(t).hasData).length;
+  const latest=allTeachers.map(t=>dateOf(t.updatedAt)).filter(Boolean).sort((a,b)=>b-a)[0];
+  $('latestUpdate').textContent=latest?latest.toLocaleDateString('ar-IQ'):'—';
+  $('loadStatus').textContent='تم تحميل '+allTeachers.length+' حساب';
+  renderTable();
+ }catch(error){
+  console.error(error);
+  $('loadStatus').textContent='تعذّر التحميل';
+  $('teachersBody').innerHTML='<tr><td colspan="5" class="empty">فشل تحميل القائمة. تحقق من قواعد Firestore وصلاحيات الأدمن.</td></tr>';
+ }
+}
+async function onLogin(user){
+ currentUser=user;
+ if(!user){$('dashboard').classList.add('hidden');$('loginScreen').classList.remove('hidden');allTeachers=[];return}
+ setLoginMessage('جارٍ التحقق من صلاحية الحساب...');
+ try{
+  const doc=await cloud.collection('admins').doc(user.uid).get();
+  if(!doc.exists||!doc.data()||doc.data().role!=='admin'){
+   await auth.signOut();
+   setLoginMessage('هذا الحساب ليس لديه صلاحية الأدمن.',true);
+   return;
+  }
+  $('loginScreen').classList.add('hidden');$('dashboard').classList.remove('hidden');
+  await loadTeachers();
+ }catch(error){
+  console.error(error);
+  await auth.signOut().catch(()=>{});
+  setLoginMessage('تعذّر التحقق من الصلاحيات. تأكد من قواعد Firestore والاتصال.',true);
+ }
+}
+try{
+ firebase.initializeApp(firebaseConfig);auth=firebase.auth();cloud=firebase.firestore();
+ auth.onAuthStateChanged(user=>{if(!user){currentUser=null;$('dashboard').classList.add('hidden');$('loginScreen').classList.remove('hidden')}});
+}catch(error){console.error(error);setLoginMessage('تعذّر تهيئة Firebase.',true)}
+$('loginBtn').addEventListener('click',async()=>{
+ if(!auth)return setLoginMessage('خدمة تسجيل الدخول غير مهيأة.',true);
+ const email=$('email').value.trim(),password=$('password').value;
+ if(!email||!password)return setLoginMessage('اكتب البريد الإلكتروني وكلمة المرور.',true);
+ $('loginBtn').disabled=true;setLoginMessage('جارٍ تسجيل الدخول...');
+ try{const result=await auth.signInWithEmailAndPassword(email,password);await onLogin(result.user)}
+ catch(error){const messages={'auth/invalid-credential':'البريد أو كلمة المرور غير صحيحة.','auth/invalid-email':'صيغة البريد الإلكتروني غير صحيحة.','auth/too-many-requests':'محاولات كثيرة؛ انتظر قليلاً ثم حاول.','auth/network-request-failed':'تحقق من اتصال الإنترنت.','auth/unauthorized-domain':'أضف عنوان الموقع إلى Authorized domains في Firebase.'};setLoginMessage(messages[error.code]||'تعذّر تسجيل الدخول: '+(error.message||'خطأ غير معروف'),true)}
+ finally{$('loginBtn').disabled=false}
+});
+$('password').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});
+$('email').addEventListener('keydown',e=>{if(e.key==='Enter')$('password').focus()});
+$('refreshBtn').addEventListener('click',loadTeachers);
+$('logoutBtn').addEventListener('click',async()=>{if(auth)await auth.signOut();currentUser=null;allTeachers=[];$('detailPanel').classList.add('hidden');setLoginMessage('تم تسجيل الخروج.')});
+$('search').addEventListener('input',renderTable);
+$('clearSearch').addEventListener('click',()=>{$('search').value='';renderTable();$('search').focus()});
+$('closeDetail').addEventListener('click',()=>$('detailPanel').classList.add('hidden'));
+})();
+</script>
+</body>
+</html>
