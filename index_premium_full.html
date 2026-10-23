@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>دفتر درجاتي</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f6fb;color:#172033;font-family:Tahoma,Arial,sans-serif}header{background:linear-gradient(120deg,#4338ca,#7c3aed);color:white;padding:20px}h1{margin:0 0 8px}.wrap{max-width:1200px;margin:16px auto;padding:0 12px}.panel{background:white;border:1px solid #dce2ec;border-radius:14px;padding:15px;margin-bottom:14px}.row,.toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:end}.field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:145px}label,.small{font-size:12px;color:#667085}input,select,button{font:inherit;border-radius:8px;padding:10px;border:1px solid #dce2ec;background:white;color:#172033}button{background:#4f46e5;color:white;border-color:#4f46e5;cursor:pointer;font-weight:bold}button.secondary{background:white;color:#172033}button.danger{background:#b42318;color:white}.toolbar{margin-top:10px}.table-wrap{overflow:auto;border:1px solid #dce2ec;border-radius:10px}table{border-collapse:separate;border-spacing:0;width:100%;min-width:950px}th,td{padding:7px;border-left:1px solid #dce2ec;border-bottom:1px solid #dce2ec;text-align:center;white-space:nowrap}th{background:#f1f3fa;position:sticky;top:0}td.name{text-align:right}td input{width:72px;padding:6px;text-align:center}.oral{background:#e8f7ee}.written{background:#eaf2ff}.final{background:#fff4d6;font-weight:bold}.pill{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:20px;padding:5px}.status{padding:8px;background:#e8f7ee;border-radius:8px;font-size:12px}@media print{body{background:white}header{background:white;color:black;padding:0}.no-print{display:none!important}.wrap{margin:0;padding:0}.panel{border:0;padding:0}table{min-width:0;font-size:10px}th{position:static}td input{border:0;width:40px;padding:0}.table-wrap{overflow:visible}}
+
+/* Premium Purple refresh — visual-only changes; Firebase and grade logic remain unchanged */
+:root{--premium-purple:#4b247c;--premium-purple-2:#7650a8;--premium-bg:#f7f4fb;--premium-ink:#251a35;--premium-line:#e8e0f1}
+body{background:radial-gradient(ellipse at top right,#f0e8fa 0,transparent 42%),var(--premium-bg);color:var(--premium-ink)}
+header{background:linear-gradient(125deg,#291442 0%,#4b247c 48%,#7650a8 100%);color:#fff;box-shadow:0 12px 32px #351b5426;border-radius:0 0 28px 28px}
+header h1{letter-spacing:-.4px}
+.panel{background:rgba(255,255,255,.97);border:1px solid var(--premium-line);border-radius:18px;box-shadow:0 8px 28px #35204d0b}
+button,input,select,textarea{font-family:inherit}
+button{border-radius:12px;transition:transform .16s ease,box-shadow .16s ease,background .16s ease}
+button:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 7px 18px #4b247c20}
+input,select,textarea{border:1px solid #ded3eb;background:#fff;border-radius:12px;min-height:42px;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:#8a65b4;box-shadow:0 0 0 3px #7650a81c}
+button:not(.secondary):not(.danger){background:linear-gradient(120deg,#4b247c,#7650a8);border-color:#4b247c}
+button.secondary{background:#f3edf9;color:#4b247c;border:1px solid #e2d5ef}
+button.danger{background:#fff0f0;color:#a32632;border:1px solid #f3d4d7}
+.stat,.detail-item{background:linear-gradient(145deg,#fff,#fbf8ff);border:1px solid var(--premium-line);border-radius:18px;box-shadow:0 8px 28px #35204d0b}
+.stat .num{color:#4b247c}
+th{background:#f3edf9;color:#59466f}
+tbody tr:hover{background:#faf6ff}
+.pill{background:#eee5f8;color:#4b247c;border-radius:20px}
+.status{border-radius:12px}
+@media(max-width:650px){.wrap{padding-inline:12px}.panel{padding:15px}header{padding:22px 15px 27px}button{min-height:42px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<section id="authScreen" style="max-width:520px;margin:28px auto;padding:18px;background:white;border:1px solid #dce2ec;border-radius:14px">
+<h2>تسجيل الدخول إلى دفتر درجاتي</h2><p class="small">سجّل دخولك حتى تحفظ درجاتك بحسابك وتوصل إلها من أجهزتك.</p>
+<div class="field" style="margin:10px 0"><label for="authEmail">البريد الإلكتروني</label><input id="authEmail" type="email" autocomplete="email" placeholder="name@example.com"></div>
+<div class="field" style="margin:10px 0"><label for="authPassword">كلمة المرور</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="6 أحرف على الأقل"></div>
+<div class="toolbar"><button id="loginBtn">تسجيل الدخول</button><button id="registerBtn" class="secondary">إنشاء حساب</button><button id="resetBtn" class="secondary">نسيت كلمة المرور؟</button></div><p id="authMessage" class="status" role="status"></p></section>
+<div id="appRoot" hidden><header><h1>دفتر درجاتي</h1><div>إدارة درجات الطلاب وحساب الشفهي والتحريري والنتيجة الشهرية والسعي</div></header>
+<div class="wrap">
+<section id="adminPanel" class="panel no-print" hidden><h3>لوحة الأدمن</h3><p class="small">قائمة حسابات المدرّسين المسجّلة. هذه اللوحة للعرض فقط ولا تعدّل درجاتهم.</p><div class="toolbar"><button id="refreshTeachers" type="button">تحديث القائمة</button><span id="adminStatus" class="status">بانتظار التحقق من صلاحية الأدمن</span></div><div class="table-wrap"><table id="teachersTable" style="min-width:500px"><thead><tr><th>البريد الإلكتروني</th><th>آخر تحديث</th></tr></thead><tbody><tr><td colspan="2">لم تُحمّل القائمة بعد.</td></tr></tbody></table></div></section>
+<section class="panel no-print"><h3>إعدادات الدفتر</h3><div class="row">
+<div class="field"><label>اسم المدرسة</label><input id="school" placeholder="اسم المدرسة"></div><div class="field"><label>اسم المدرّس</label><input id="teacher" placeholder="اسم المدرّس"></div><div class="field"><label>الصف / الشعبة</label><input id="grade" placeholder="السادس الابتدائي / أ"></div><div class="field"><label>الشهر</label><select id="month"><option>الشهر الأول</option><option>الشهر الثاني</option><option>الشهر الثالث</option><option>الشهر الرابع</option><option>الشهر الخامس</option><option>الشهر السادس</option></select></div></div><div class="toolbar"><button id="saveMeta">حفظ الإعدادات</button><span id="status" class="status">الحفظ محلي على هذا الجهاز</span></div><p class="small">تُحفظ البيانات على الجهاز، وتُزامن مع Firebase بعد تسجيل الدخول ونجاح الاتصال. نزّل نسخة احتياطية بانتظام.</p></section>
+<section class="panel no-print"><h3>إضافة حقل درجات</h3><div class="row"><div class="field"><label>اسم الحقل</label><input id="fieldName" placeholder="مثال: الواجب أو المشاركة"></div><div class="field"><label>نوع الحقل</label><select id="fieldType"><option value="oral">شفهي</option><option value="written">تحريري</option></select></div><button id="addField">إضافة الحقل</button></div><div id="fieldList" class="toolbar"></div></section>
+<section class="panel no-print"><h3>إدارة الطلاب</h3><div class="row"><div class="field"><label>اسم الطالب</label><input id="studentName" placeholder="الاسم الثلاثي"></div><button id="addStudent">إضافة طالب</button><button id="sort" class="secondary">ترتيب الأسماء</button></div><div class="toolbar"><button id="csv" class="secondary">تصدير CSV</button><button id="backup" class="secondary">تنزيل نسخة احتياطية</button><label class="secondary" style="padding:10px;border:1px solid #dce2ec;border-radius:8px">استيراد نسخة <input type="file" id="restore" accept=".json" style="width:150px;padding:3px"></label><button id="print" class="secondary">طباعة</button><button id="clear" class="danger">مسح كل البيانات</button></div></section>
+<section class="panel"><h3>جدول الدرجات</h3><div id="info" class="small"></div><div class="table-wrap"><table id="tbl"><thead></thead><tbody></tbody></table></div><p class="small">النتيجة الشهرية = (مجموع الشفهي + مجموع التحريري) ÷ 2. السعي = متوسط نتيجة الشهر الأول والثاني، ويُقرّب لأقرب عدد صحيح.</p></section>
+</div></div>
+<script>
+(()=>{'use strict';const $=x=>document.getElementById(x),KEY='daftarDarajati_complete_v1';
+const blank=()=>({meta:{school:'',teacher:'',grade:'',month:'الشهر الأول'},fields:[],students:[],grades:{}});
+function norm(x){let d=blank();if(!x||typeof x!=='object')return d;d.meta={...d.meta,...(x.meta||{})};d.fields=Array.isArray(x.fields)?x.fields.filter(f=>f&&f.id&&f.name).map(f=>({id:String(f.id),name:String(f.name),type:f.type==='written'?'written':'oral'})):[];d.students=Array.isArray(x.students)?x.students.filter(s=>s&&s.id).map(s=>({id:String(s.id),name:String(s.name||'طالب')})):[];d.grades=x.grades&&typeof x.grades==='object'?x.grades:{};if(x.settings&&Array.isArray(x.settings.customFields)&&!d.fields.length)d.fields=x.settings.customFields.map((f,i)=>typeof f==='string'?{id:'legacy_'+i,name:f,type:'oral'}:{id:String(f.id||'legacy_'+i),name:String(f.name||f.label||'حقل '+(i+1)),type:f.type==='written'?'written':'oral'});if(x.rosters&&!d.students.length){let a=Object.values(x.rosters).find(Array.isArray)||[];d.students=a.map((s,i)=>typeof s==='string'?{id:'legacy_'+i,name:s}:{id:String(s.id||s.studentId||'legacy_'+i),name:String(s.name||s.fullName||'طالب')})}return d}
+let db;try{db=norm(JSON.parse(localStorage.getItem(KEY)||'null'))}catch(e){db=blank()}
+let save=()=>{localStorage.setItem(KEY,JSON.stringify(db));$('status').textContent='تم الحفظ على هذا الجهاز'},uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const gkey=(m,s)=>m+'|'+s,grade=(m,s,f)=>{let v=db.grades[gkey(m,s)]?.[f];return v===''||v==null?null:Number(v)},total=(m,s,t)=>db.fields.filter(f=>f.type===t).reduce((n,f)=>n+(grade(m,s,f.id)||0),0),final=(m,s)=>(total(m,s,'oral')+total(m,s,'written'))/2,effort=s=>($('month').value==='الشهر الأول'?'—':Math.round((final('الشهر الأول',s)+final('الشهر الثاني',s))/2)),fmt=n=>String(Math.round(n*100)/100);
+function render(){['school','teacher','grade'].forEach(k=>$(k).value=db.meta[k]||'');$('month').value=db.meta.month||'الشهر الأول';renderFields();renderTable()}
+function renderFields(){$('fieldList').innerHTML=db.fields.length?db.fields.map(f=>`<span class="pill">${esc(f.name)} · ${f.type==='oral'?'شفهي':'تحريري'} <button class="secondary" data-rm="${esc(f.id)}">×</button></span>`).join(''):'<span class="small">ماكو حقول مضافة بعد.</span>';$('fieldList').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{if(!confirm('حذف الحقل ودرجاته؟'))return;let id=b.dataset.rm;db.fields=db.fields.filter(f=>f.id!==id);Object.values(db.grades).forEach(x=>delete x[id]);save();render()})}
+function renderTable(){let m=$('month').value;let h='<tr><th>#</th><th>اسم الطالب</th>'+db.fields.map(f=>`<th>${esc(f.name)}<br><span class="small">${f.type==='oral'?'شفهي':'تحريري'}</span></th>`).join('')+'<th class="oral">مجموع الشفهي</th><th class="written">مجموع التحريري</th><th class="final">النتيجة الشهرية</th><th>السعي</th><th class="no-print">إجراء</th></tr>';$('tbl').querySelector('thead').innerHTML=h;$('info').textContent=db.students.length+' طالب · '+m;
+$('tbl').querySelector('tbody').innerHTML=db.students.length?db.students.map((s,i)=>`<tr data-s="${esc(s.id)}"><td>${i+1}</td><td class="name">${esc(s.name)}</td>${db.fields.map(f=>`<td><input type="number" min="0" step="any" data-f="${esc(f.id)}" data-s="${esc(s.id)}" value="${grade(m,s.id,f.id)??''}"></td>`).join('')}<td class="oral" data-t="oral">${fmt(total(m,s.id,'oral'))}</td><td class="written" data-t="written">${fmt(total(m,s.id,'written'))}</td><td class="final" data-t="final">${fmt(final(m,s.id))}</td><td data-t="effort">${effort(s.id)}</td><td class="no-print"><button class="danger" data-del="${esc(s.id)}">حذف</button></td></tr>`).join(''):`<tr><td colspan="${db.fields.length+7}">أضف أسماء الطلاب حتى يظهر الجدول.</td></tr>`;
+$('tbl').querySelectorAll('[data-f]').forEach(inp=>inp.onchange=()=>{if(inp.value!==''&&Number(inp.value)<0){alert('الدرجة لا يمكن أن تكون سالبة');inp.value='';}let k=gkey(m,inp.dataset.s);db.grades[k]??={};if(inp.value==='')delete db.grades[k][inp.dataset.f];else db.grades[k][inp.dataset.f]=Number(inp.value);save();let tr=inp.closest('tr');tr.querySelector('[data-t="oral"]').textContent=fmt(total(m,inp.dataset.s,'oral'));tr.querySelector('[data-t="written"]').textContent=fmt(total(m,inp.dataset.s,'written'));tr.querySelector('[data-t="final"]').textContent=fmt(final(m,inp.dataset.s));tr.querySelector('[data-t="effort"]').textContent=effort(inp.dataset.s)});
+$('tbl').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{let id=b.dataset.del;if(!confirm('حذف الطالب وكل درجاته؟'))return;db.students=db.students.filter(s=>s.id!==id);Object.keys(db.grades).forEach(k=>{if(k.endsWith('|'+id))delete db.grades[k]});save();renderTable()})}
+$('saveMeta').onclick=()=>{['school','teacher','grade'].forEach(k=>db.meta[k]=$(k).value.trim());db.meta.month=$('month').value;save();renderTable()};$('month').onchange=()=>{db.meta.month=$('month').value;save();renderTable()};
+$('addField').onclick=()=>{let name=$('fieldName').value.trim();if(!name)return alert('اكتب اسم الحقل');if(db.fields.some(f=>f.name===name))return alert('الحقل موجود');db.fields.push({id:uid(),name,type:$('fieldType').value});$('fieldName').value='';save();render()};
+$('addStudent').onclick=()=>{let name=$('studentName').value.trim();if(!name)return alert('اكتب اسم الطالب');db.students.push({id:uid(),name});$('studentName').value='';save();renderTable()};$('sort').onclick=()=>{db.students.sort((a,b)=>a.name.localeCompare(b.name,'ar'));save();renderTable()};
+function dl(blob,name){let a=document.createElement('a'),u=URL.createObjectURL(blob);a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+$('backup').onclick=()=>dl(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),'دفتر-درجاتي-نسخة.json');
+$('restore').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let x=norm(JSON.parse(await f.text()));if(!confirm('استبدال البيانات الحالية بالنسخة؟'))return;db=x;save();render();alert('تم الاستيراد. تحقق من البيانات.')}catch(err){alert('ملف غير صالح')}e.target.value=''};
+$('csv').onclick=()=>{let m=$('month').value,rows=[['ت','اسم الطالب',...db.fields.map(f=>f.name+' '+(f.type==='oral'?'شفهي':'تحريري')),'مجموع الشفهي','مجموع التحريري','النتيجة الشهرية','السعي']];db.students.forEach((s,i)=>rows.push([i+1,s.name,...db.fields.map(f=>grade(m,s.id,f.id)??''),total(m,s.id,'oral'),total(m,s.id,'written'),final(m,s.id),effort(s.id)]));dl(new Blob(['\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}),'درجات-'+m+'.csv')};
+$('print').onclick=()=>print();$('clear').onclick=()=>{if(confirm('مسح كل بيانات هذا الدفتر؟ نزّل نسخة احتياطية أولاً.')&&confirm('تأكيد أخير لمسح كل البيانات؟')){db=blank();save();render()}};
+const firebaseConfig={apiKey:'AIzaSyBRTvRGBdsZBQprCcuPTDeuVX-UePGyYXQ',authDomain:'daftar-darajati.firebaseapp.com',projectId:'daftar-darajati',storageBucket:'daftar-darajati.firebasestorage.app',messagingSenderId:'187711517936',appId:'1:187711517936:web:63b22637601a1ed6163e35'};
+let auth=null,cloud=null,currentUser=null,remoteReady=false,saveTimer=null,isAdmin=false;
+const authMsg=t=>{$('authMessage').textContent=t};
+function friendlyAuthError(e){return ({'auth/email-already-in-use':'هذا البريد مسجّل مسبقاً.','auth/invalid-email':'البريد الإلكتروني غير صحيح.','auth/weak-password':'كلمة المرور لازم تكون 6 أحرف على الأقل.','auth/invalid-credential':'البريد أو كلمة المرور غير صحيحة.','auth/network-request-failed':'تحقق من اتصال الإنترنت.','auth/too-many-requests':'محاولات كثيرة؛ انتظر شوي وحاول مرة ثانية.','auth/unauthorized-domain':'أضف عنوان الموقع إلى Authorized domains في Firebase.','auth/operation-not-allowed':'فعّل تسجيل الدخول بالبريد وكلمة المرور من Firebase.'})[e.code]||('تعذّر إكمال العملية: '+(e.message||'خطأ غير معروف'))}
+$('loginBtn').onclick=async()=>{if(!auth){authMsg('خدمة تسجيل الدخول غير مهيأة.');return}const email=$('authEmail').value.trim(),password=$('authPassword').value;if(!email||!password){authMsg('اكتب البريد الإلكتروني وكلمة المرور.');return}authMsg('جارٍ تسجيل الدخول...');try{await auth.signInWithEmailAndPassword(email,password)}catch(e){authMsg(friendlyAuthError(e))}};
+$('registerBtn').onclick=async()=>{if(!auth){authMsg('خدمة تسجيل الدخول غير مهيأة.');return}const email=$('authEmail').value.trim(),password=$('authPassword').value;if(!email||password.length<6){authMsg('اكتب بريد صحيح وكلمة مرور من 6 أحرف على الأقل.');return}authMsg('جارٍ إنشاء الحساب...');try{await auth.createUserWithEmailAndPassword(email,password)}catch(e){authMsg(friendlyAuthError(e))}};
+$('resetBtn').onclick=async()=>{const email=$('authEmail').value.trim();if(!email){authMsg('اكتب بريدك الإلكتروني أولاً.');return}try{await auth.sendPasswordResetEmail(email);authMsg('إذا البريد مسجّل، راح توصلك رسالة استعادة كلمة المرور.')}catch(e){authMsg(friendlyAuthError(e))}};
+const originalSave=save;save=()=>{localStorage.setItem(KEY,JSON.stringify(db));$('status').textContent=currentUser&&remoteReady?'جارٍ حفظ التغييرات سحابياً...':'تم الحفظ على هذا الجهاز';if(currentUser&&cloud&&remoteReady){clearTimeout(saveTimer);saveTimer=setTimeout(async()=>{try{await cloud.collection('teachers').doc(currentUser.uid).set({email:currentUser.email||'',data:db,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});$('status').textContent='تم الحفظ على الجهاز والسحابة ✓'}catch(e){console.error(e);$('status').textContent='حُفظ محلياً، لكن فشل الحفظ السحابي'}},600)}};
+try{firebase.initializeApp(firebaseConfig);auth=firebase.auth();cloud=firebase.firestore()}catch(e){console.error(e);authMsg('تعذّر تهيئة Firebase.')}
+const signout=document.createElement('button');signout.textContent='تسجيل الخروج';signout.className='secondary no-print';signout.style.margin='10px';signout.onclick=async()=>{remoteReady=false;if(auth)await auth.signOut()};document.querySelector('header').appendChild(signout);
+const badge=document.createElement('span');badge.id='roleBadge';badge.className='pill';badge.style.margin='8px';badge.textContent='الحساب';document.querySelector('header').appendChild(badge);
+async function loadTeachers(){
+ const status=$('adminStatus'),body=$('teachersTable').querySelector('tbody');
+ status.textContent='جارٍ تحميل قائمة المدرّسين...';
+ try{const snap=await cloud.collection('teachers').get();
+  if(snap.empty){body.innerHTML='<tr><td colspan="2">ماكو حسابات مدرسين محفوظة حالياً.</td></tr>';}
+  else{body.innerHTML=snap.docs.map(doc=>{const d=doc.data()||{};let updated='—';try{if(d.updatedAt&&d.updatedAt.toDate)updated=d.updatedAt.toDate().toLocaleString('ar-IQ')}catch(_){};return '<tr><td>'+esc(d.email||'بدون بريد')+'</td><td>'+esc(updated)+'</td></tr>'}).join('');}
+  status.textContent='تم تحميل '+snap.size+' حساب/حسابات.';
+ }catch(e){console.error('Admin teachers list error:',e);body.innerHTML='<tr><td colspan="2">تعذّر تحميل القائمة. تحقق من قواعد Firestore.</td></tr>';status.textContent='فشل التحميل: '+(e.code||e.message||'خطأ غير معروف');}
+}
+$('refreshTeachers').onclick=()=>{if(isAdmin)loadTeachers()};
+if(auth)auth.onAuthStateChanged(async user=>{
+ currentUser=user;remoteReady=false;isAdmin=false;$('adminPanel').hidden=true;$('roleBadge').textContent='الحساب';
+ if(!user){$('authScreen').hidden=false;$('appRoot').hidden=true;return}
+ $('authScreen').hidden=true;$('appRoot').hidden=false;$('status').textContent='جارٍ تحميل بيانات حسابك...';
+ try{
+  // صلاحية الأدمن تُقرأ من admins/{uid} وفق إعداد قاعدة البيانات.
+  const adminDoc=await cloud.collection('admins').doc(user.uid).get();
+  isAdmin=adminDoc.exists&&adminDoc.data().role==='admin';
+  $('roleBadge').textContent=isAdmin?'الأدمن':'حساب مدرس';
+  $('adminPanel').hidden=!isAdmin;
+  const ref=cloud.collection('teachers').doc(user.uid),snap=await ref.get();
+  if(snap.exists&&snap.data().data){db=norm(snap.data().data);localStorage.setItem(KEY,JSON.stringify(db));}
+  else{
+   const local=localStorage.getItem(KEY);
+   if(local){const localData=norm(JSON.parse(local));if(localData.students.length||localData.fields.length||Object.keys(localData.grades).length)db=localData;}
+   await ref.set({email:user.email||'',data:db,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+  }
+  remoteReady=true;render();$('status').textContent='تم تحميل بيانات حسابك من السحابة ✓';
+  if(isAdmin)await loadTeachers();
+ }catch(e){console.error('Account load error:',e);$('status').textContent='تعذّر تحميل السحابة: '+(e.code||e.message||'تحقق من الاتصال والصلاحيات');remoteReady=false;}
+});
+render();
+})();
+</script></body></html>
