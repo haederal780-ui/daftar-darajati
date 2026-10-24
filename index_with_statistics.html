@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>دفتر درجاتي</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f6fb;color:#172033;font-family:Tahoma,Arial,sans-serif}header{background:linear-gradient(120deg,#4338ca,#7c3aed);color:white;padding:20px}h1{margin:0 0 8px}.wrap{max-width:1200px;margin:16px auto;padding:0 12px}.panel{background:white;border:1px solid #dce2ec;border-radius:14px;padding:15px;margin-bottom:14px}.row,.toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:end}.field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:145px}label,.small{font-size:12px;color:#667085}input,select,button{font:inherit;border-radius:8px;padding:10px;border:1px solid #dce2ec;background:white;color:#172033}button{background:#4f46e5;color:white;border-color:#4f46e5;cursor:pointer;font-weight:bold}button.secondary{background:white;color:#172033}button.danger{background:#b42318;color:white}.toolbar{margin-top:10px}.table-wrap{overflow:auto;border:1px solid #dce2ec;border-radius:10px}table{border-collapse:separate;border-spacing:0;width:100%;min-width:950px}th,td{padding:7px;border-left:1px solid #dce2ec;border-bottom:1px solid #dce2ec;text-align:center;white-space:nowrap}th{background:#f1f3fa;position:sticky;top:0}td.name{text-align:right}td input{width:72px;padding:6px;text-align:center}.oral{background:#e8f7ee}.written{background:#eaf2ff}.final{background:#fff4d6;font-weight:bold}.pill{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:20px;padding:5px}.status{padding:8px;background:#e8f7ee;border-radius:8px;font-size:12px}@media print{body{background:white}header{background:white;color:black;padding:0}.no-print{display:none!important}.wrap{margin:0;padding:0}.panel{border:0;padding:0}table{min-width:0;font-size:10px}th{position:static}td input{border:0;width:40px;padding:0}.table-wrap{overflow:visible}}
+
+/* Premium Purple refresh — visual-only changes; Firebase and grade logic remain unchanged */
+:root{--premium-purple:#4b247c;--premium-purple-2:#7650a8;--premium-bg:#f7f4fb;--premium-ink:#251a35;--premium-line:#e8e0f1}
+body{background:radial-gradient(ellipse at top right,#f0e8fa 0,transparent 42%),var(--premium-bg);color:var(--premium-ink)}
+header{background:linear-gradient(125deg,#291442 0%,#4b247c 48%,#7650a8 100%);color:#fff;box-shadow:0 12px 32px #351b5426;border-radius:0 0 28px 28px}
+header h1{letter-spacing:-.4px}
+.panel{background:rgba(255,255,255,.97);border:1px solid var(--premium-line);border-radius:18px;box-shadow:0 8px 28px #35204d0b}
+button,input,select,textarea{font-family:inherit}
+button{border-radius:12px;transition:transform .16s ease,box-shadow .16s ease,background .16s ease}
+button:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 7px 18px #4b247c20}
+input,select,textarea{border:1px solid #ded3eb;background:#fff;border-radius:12px;min-height:42px;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:#8a65b4;box-shadow:0 0 0 3px #7650a81c}
+button:not(.secondary):not(.danger){background:linear-gradient(120deg,#4b247c,#7650a8);border-color:#4b247c}
+button.secondary{background:#f3edf9;color:#4b247c;border:1px solid #e2d5ef}
+button.danger{background:#fff0f0;color:#a32632;border:1px solid #f3d4d7}
+.stat,.detail-item{background:linear-gradient(145deg,#fff,#fbf8ff);border:1px solid var(--premium-line);border-radius:18px;box-shadow:0 8px 28px #35204d0b}
+.stat .num{color:#4b247c}
+th{background:#f3edf9;color:#59466f}
+tbody tr:hover{background:#faf6ff}
+.pill{background:#eee5f8;color:#4b247c;border-radius:20px}
+.status{border-radius:12px}
+@media(max-width:650px){.wrap{padding-inline:12px}.panel{padding:15px}header{padding:22px 15px 27px}button{min-height:42px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+
+
+/* Redesign: match the purple dashboard concept while preserving the existing app logic */
+:root{--purple-deep:#321653;--purple:#4b247c;--purple-mid:#6840b5;--purple-light:#8a63d2;--surface:#fff;--line:#e5dcf2;--text:#281b3b;--muted:#756887}
+html{scroll-behavior:smooth}
+body{background:linear-gradient(135deg,#f8f5ff 0%,#f0eaff 48%,#faf8ff 100%)!important;color:var(--text)!important;font-family:Tahoma,Arial,sans-serif}
+header{position:relative;overflow:hidden;background:linear-gradient(115deg,#321653 0%,#4b247c 48%,#7650c8 100%)!important;color:#fff!important;padding:24px 26px!important;box-shadow:0 10px 30px #3a1a6028;border-radius:0 0 25px 25px}
+header:after{content:"";position:absolute;inset:0 auto 0 24%;width:34%;background:linear-gradient(120deg,transparent 0%,#ffffff0d 45%,transparent 70%);transform:skewX(-24deg);pointer-events:none}
+header h1{font-size:clamp(25px,3vw,34px);font-weight:800;letter-spacing:-.5px;margin:0 0 7px}
+header>div{font-size:13px;opacity:.9;line-height:1.8}
+.wrap{max-width:1500px;margin:18px auto;padding:0 18px}
+.panel{background:rgba(255,255,255,.94)!important;border:1px solid #e2d8f4!important;border-radius:17px!important;padding:18px!important;margin-bottom:15px;box-shadow:0 6px 22px #42216c0d!important}
+.panel h3{margin:0 -18px 16px;padding:0 18px 12px;border-bottom:1px solid #eee7f7;color:#452178;font-size:17px;font-weight:800}
+.row,.toolbar{gap:11px}
+.field{gap:7px;min-width:150px}
+label,.small{color:var(--muted)!important;line-height:1.7}
+input,select,textarea{font-family:inherit!important;color:#34254a!important;background:#fff!important;border:1px solid #e2d8f1!important;border-radius:11px!important;min-height:42px;padding:10px 12px!important;box-shadow:0 2px 7px #43216b08;transition:border-color .16s,box-shadow .16s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#9b7bd1!important;box-shadow:0 0 0 3px #8a63d21b!important}
+button{font-family:inherit!important;background:linear-gradient(120deg,#5a2bb0,#7950d4)!important;color:#fff!important;border:1px solid #6940bf!important;border-radius:11px!important;padding:10px 15px!important;min-height:40px;box-shadow:0 3px 9px #4b247c12;transition:transform .16s,box-shadow .16s}
+button:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 7px 17px #4b247c24}
+button.secondary{background:#f6f1fc!important;color:#4b247c!important;border-color:#e4d7f4!important;box-shadow:none}
+button.danger{background:linear-gradient(120deg,#e83b55,#f04e68)!important;color:#fff!important;border-color:#df3650!important}
+.toolbar{margin-top:12px}
+.table-wrap{overflow:auto;border:1px solid #e3d9f3!important;border-radius:11px!important;background:#fff}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:950px}
+th,td{padding:9px 8px;border-left:1px solid #e7def4!important;border-bottom:1px solid #e7def4!important;text-align:center;white-space:nowrap}
+th{background:#f2ebfc!important;color:#4b247c!important;position:sticky;top:0;font-weight:800}
+tbody tr:nth-child(even){background:#fcfaff}
+tbody tr:hover{background:#f6f0ff!important}
+td.name{text-align:right}
+td input{width:72px;min-height:34px;padding:5px!important;text-align:center;border-radius:8px!important}
+.oral{background:#e9f8ef!important}.written{background:#edf3ff!important}.final{background:#fff5d9!important;font-weight:bold}
+.pill{display:inline-block;background:#eee5fa!important;color:#4b247c!important;border-radius:20px;padding:5px 10px;font-weight:700}
+.status{display:inline-block;padding:8px 11px;background:#e9f8ef!important;color:#187744;border:1px solid #d4f0df;border-radius:10px;font-size:12px}
+#authScreen{max-width:520px!important;margin:40px auto!important;padding:24px!important;background:rgba(255,255,255,.97)!important;border:1px solid #e2d8f4!important;border-radius:20px!important;box-shadow:0 15px 45px #3d1d6818!important}
+#authScreen h2{color:#4b247c;font-size:23px;margin-top:0}
+#authScreen .toolbar button{flex:1}
+@media(max-width:650px){header{padding:21px 16px!important;border-radius:0 0 20px 20px}.wrap{padding:0 10px;margin-top:12px}.panel{padding:14px!important;border-radius:14px!important}.panel h3{margin:0 -14px 13px;padding:0 14px 10px;font-size:16px}.row,.toolbar{gap:8px}.field{min-width:130px}button{padding:10px 12px!important}#authScreen{margin:18px 12px!important;padding:18px!important}}
+@media print{body{background:white!important}header{background:white!important;color:black!important;box-shadow:none!important;border-radius:0!important}header:after{display:none}.panel{box-shadow:none!important;border:0!important}}
+
+
+/* Unified premium design for BOTH sign-in and grade-book screens */
+:root{--p:#4b247c;--p2:#7650a8;--bg:#f7f4fb;--ink:#251a35;--line:#e8e0f1}
+body{background:radial-gradient(ellipse at top right,#f0e8fa 0,transparent 42%),var(--bg)!important;color:var(--ink)!important}
+#authScreen{max-width:480px!important;margin:clamp(24px,7vh,76px) auto!important;padding:30px!important;background:rgba(255,255,255,.97)!important;border:1px solid var(--line)!important;border-radius:24px!important;box-shadow:0 20px 60px #351b5418!important;position:relative;overflow:hidden}
+#authScreen:before{content:"";display:block;height:8px;position:absolute;inset:0 0 auto;background:linear-gradient(100deg,#291442,#4b247c,#9b79c7)}
+#authScreen h2{color:var(--p);font-size:25px;margin:12px 0 10px;letter-spacing:-.4px}
+#authScreen .small{font-size:13px;line-height:1.9;color:#796d88}
+#authScreen .field{margin:16px 0!important;gap:8px}
+#authScreen label{font-size:13px;color:#59466f;font-weight:bold}
+#authScreen input{width:100%;min-height:48px;padding:12px 14px!important;border:1px solid #ded3eb!important;border-radius:13px!important;background:#fff}
+#authScreen .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+#authScreen #loginBtn{grid-column:1/-1;min-height:48px}
+#authScreen button{border-radius:13px;min-height:44px;padding:11px 14px;background:linear-gradient(120deg,#4b247c,#7650a8);border:1px solid #4b247c;color:#fff}
+#authScreen button.secondary{background:#f3edf9!important;color:#4b247c!important;border:1px solid #e2d5ef!important}
+#authScreen #authMessage{margin:18px 0 0;line-height:1.7;background:#f7f2fc;color:#59466f;border:1px solid #e8e0f1}
+#appRoot>header{background:linear-gradient(125deg,#291442 0%,#4b247c 48%,#7650a8 100%)!important;color:#fff!important;box-shadow:0 12px 32px #351b5426;border-radius:0 0 28px 28px!important;padding:25px max(18px,calc((100% - 1200px)/2)) 30px!important}
+#appRoot>header h1{font-size:clamp(25px,3vw,34px);letter-spacing:-.5px}
+#appRoot .panel{background:rgba(255,255,255,.97)!important;border:1px solid var(--line)!important;border-radius:18px!important;box-shadow:0 8px 28px #35204d0b!important}
+#appRoot h3{color:var(--p);margin-top:0}
+#appRoot button{border-radius:12px;transition:transform .16s ease,box-shadow .16s ease;}
+#appRoot button:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 7px 18px #4b247c20}
+#appRoot button:not(.secondary):not(.danger){background:linear-gradient(120deg,#4b247c,#7650a8);border-color:#4b247c;color:#fff}
+#appRoot input,#appRoot select{border:1px solid #ded3eb!important;border-radius:12px!important;background:#fff;min-height:42px;outline:none}
+#appRoot input:focus,#appRoot select:focus{border-color:#8a65b4!important;box-shadow:0 0 0 3px #7650a81c!important}
+#appRoot th{background:#f3edf9!important;color:#59466f!important}
+#appRoot .oral{background:#e8f7ee!important}#appRoot .written{background:#eaf2ff!important}#appRoot .final{background:#fff4d6!important}
+#appRoot .pill{background:#eee5f8!important;color:#4b247c!important;border-radius:20px}
+#appRoot button.secondary{background:#f3edf9!important;color:#4b247c!important;border:1px solid #e2d5ef!important}
+#appRoot button.danger{background:#fff0f0!important;color:#a32632!important;border:1px solid #f3d4d7!important}
+@media(max-width:600px){#authScreen{margin:22px 14px!important;padding:24px 18px!important}#authScreen .toolbar{grid-template-columns:1fr}#authScreen #loginBtn{grid-column:auto}#appRoot>header{padding:22px 15px 27px!important}.wrap{padding-inline:12px}.panel{padding:15px!important}}
+
+/* MODERN LAYOUT V2 — structural styling, not just a color change */
+:root{--ui-bg:#f6f4fb;--ui-card:#fff;--ui-ink:#241633;--ui-muted:#776b88;--ui-border:#e8e0f1;--ui-purple:#5b2a91;--ui-purple2:#8755c7;--ui-shadow:0 12px 34px rgba(50,22,83,.075)}
+html{scroll-behavior:smooth}
+body{background:linear-gradient(145deg,#f8f6fc 0%,#f1ebf9 48%,#faf9fc 100%)!important;color:var(--ui-ink)!important;line-height:1.65}
+#authScreen{width:min(480px,calc(100% - 28px))!important;margin:clamp(28px,8vh,88px) auto!important;padding:clamp(24px,4vw,38px)!important;background:rgba(255,255,255,.96)!important;border:1px solid #e6dcef!important;border-radius:28px!important;box-shadow:0 24px 70px rgba(53,25,82,.14)!important;position:relative;overflow:hidden}
+#authScreen:before{content:"";display:block;height:7px;position:absolute;inset:0 0 auto;background:linear-gradient(90deg,#321653,#7543ad,#b59add)}
+#authScreen h2{font-size:clamp(23px,4vw,29px);line-height:1.35;margin:4px 0 8px;color:#321653;font-weight:900;letter-spacing:-.5px}
+#authScreen .small{font-size:13px;line-height:1.9;color:#7d718b!important;margin:0 0 22px}
+#authScreen .field{margin:14px 0!important;gap:8px}
+#authScreen label{font-size:13px;font-weight:700;color:#4b3b5d!important}
+#authScreen input{width:100%;height:49px;padding:12px 14px!important;background:#fbf9fd!important;border-radius:14px!important}
+#authScreen .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+#authScreen #loginBtn{grid-column:1/-1;min-height:49px;font-size:15px}
+#authScreen #resetBtn{grid-column:1/-1}
+#authScreen .status{margin-top:14px}
+#appRoot>header{padding:30px clamp(18px,4vw,48px) 35px!important;border-radius:0 0 30px 30px!important;box-shadow:0 16px 35px rgba(50,22,83,.16)!important;position:relative}
+#appRoot>header h1{font-size:clamp(27px,3.6vw,38px)!important;font-weight:900;line-height:1.3;margin:0 0 8px!important}
+#appRoot>header>div{font-size:14px;line-height:1.8;max-width:760px}
+#appRoot>header #roleBadge{display:inline-flex;align-items:center;margin:12px 0 0!important;padding:6px 12px!important;border:1px solid #ffffff42;background:#ffffff1c;color:white;border-radius:999px}
+#appRoot>header button{margin:12px 0 0 8px!important;background:#fff!important;color:#4b247c!important;border:1px solid #ffffff80!important;box-shadow:none!important}
+.wrap{max-width:1440px!important;margin:26px auto!important;padding:0 clamp(12px,2.4vw,30px)!important}
+.panel{padding:clamp(16px,2.2vw,25px)!important;border:1px solid var(--ui-border)!important;border-radius:22px!important;box-shadow:var(--ui-shadow)!important;margin-bottom:20px!important;min-width:0}
+.panel h3{font-size:18px!important;display:flex;align-items:center;gap:10px;color:#432163!important;margin:0 0 20px!important;padding:0 0 13px!important;border-bottom:1px solid #eee8f5!important}
+.panel h3:before{content:"";width:5px;height:23px;border-radius:8px;background:linear-gradient(#8c5ac8,#4b247c);display:inline-block;flex:none}
+.row{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));align-items:end;gap:14px!important}
+.field{min-width:0!important;gap:7px!important}
+label{font-size:13px!important;font-weight:700;color:#51425f!important}
+input,select,textarea{width:100%;min-height:46px!important;padding:11px 13px!important;border-radius:13px!important;background:#fcfaff!important;border:1px solid #e3d9ed!important;color:#2c1d3c!important}
+button{min-height:43px;padding:11px 17px!important;border-radius:13px!important;font-weight:800;letter-spacing:0!important}
+.toolbar{display:flex;align-items:center;gap:10px!important;margin-top:15px!important;flex-wrap:wrap}
+.toolbar button{max-width:100%}
+.status{display:inline-block;padding:9px 13px!important;border-radius:12px!important;line-height:1.6}
+.pill{padding:6px 11px!important;border-radius:999px!important;font-weight:700}
+#fieldList{padding:4px 0;gap:9px!important}
+#fieldList .pill{display:inline-flex;align-items:center;gap:8px;border:1px solid #e5d8f2}
+#fieldList button{min-height:28px!important;padding:2px 8px!important;border-radius:8px!important}
+.table-wrap{border:1px solid #e6deef!important;border-radius:16px!important;box-shadow:inset 0 1px 0 #fff;max-height:68vh;overflow:auto!important;background:#fff}
+table{width:100%;border-collapse:separate!important;border-spacing:0!important;min-width:980px}
+th,td{padding:11px 10px!important;border-left:0!important;border-bottom:1px solid #eee8f4!important;white-space:nowrap}
+th{background:#f4effa!important;color:#51366b!important;font-size:12px;font-weight:800;position:sticky;top:0;z-index:2}
+tbody tr:nth-child(even){background:#fcfaff}
+tbody tr:hover{background:#f5effc!important}
+td input{min-width:72px;min-height:38px!important;text-align:center;border-radius:10px!important;background:#fff!important;padding:7px!important}
+td.name{font-weight:700;color:#342046;max-width:240px;overflow:hidden;text-overflow:ellipsis}
+td.oral{background:#effaf4!important;color:#176b48;font-weight:800}
+td.written{background:#eff5ff!important;color:#2857a3;font-weight:800}
+td.final{background:#fff7e6!important;color:#8a5710;font-weight:900}
+#info{padding:0 0 12px;font-size:13px!important}
+button.danger{background:#fff1f1!important;color:#a62b37!important;border-color:#f1d0d4!important}
+@media(min-width:1000px){#appRoot .wrap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}#appRoot .wrap>.panel{margin:0!important}#appRoot .wrap>.panel:last-child{grid-column:1/-1}}
+@media(max-width:720px){#authScreen{margin:28px auto!important;border-radius:22px!important}#appRoot>header{padding:25px 17px 29px!important;border-radius:0 0 22px 22px!important}.wrap{margin:16px auto!important;padding:0 11px!important}.panel{border-radius:17px!important;padding:16px!important}.panel h3{font-size:16px!important}.row{grid-template-columns:1fr!important}.toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}.toolbar button{width:100%;padding-inline:8px!important;font-size:13px}.table-wrap{max-height:62vh}table{min-width:850px}th,td{padding:9px 7px!important}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important}}
+
+
+/* Student insight cards and monthly ranking */
+.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:4px 0 26px}
+.stat-card{padding:18px;border:1px solid #e9e0f2;border-radius:17px;background:linear-gradient(145deg,#fff,#faf7fe);display:flex;flex-direction:column;gap:5px;min-width:0}
+.stat-card span{font-size:13px;font-weight:800;color:#756488}.stat-card strong{font-size:clamp(24px,3vw,34px);line-height:1.3;color:#4c2477;font-weight:900;overflow-wrap:anywhere}.stat-card small{font-size:11px;color:#8a7c99;line-height:1.6}
+.rank-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.rank-head h4{font-size:17px;color:#3f205e;margin:0 0 4px}.rank-head p{font-size:12px;color:#82758f;margin:0}.rank-month{padding:7px 12px;border-radius:999px;background:#f1e8fb;color:#5a2a89;font-weight:800;font-size:12px;white-space:nowrap}
+#rankTable{min-width:560px}#rankTable td{font-weight:650}#rankTable tr.rank-first td{background:#fff8e7!important}#rankTable tr.rank-second td{background:#f7f7fb!important}#rankTable tr.rank-third td{background:#fff2e9!important}.rank-medal{font-size:17px}.rank-score{font-weight:900;color:#4b247c}
+@media(max-width:760px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.stat-card{padding:13px}.rank-head{align-items:flex-start;flex-direction:column}.rank-month{align-self:flex-start}}
+
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<section id="authScreen" style="max-width:520px;margin:28px auto;padding:18px;background:white;border:1px solid #dce2ec;border-radius:14px">
+<h2>تسجيل الدخول إلى دفتر درجاتي</h2><p class="small">سجّل دخولك حتى تحفظ درجاتك بحسابك وتوصل إلها من أجهزتك.</p>
+<div class="field" style="margin:10px 0"><label for="authEmail">البريد الإلكتروني</label><input id="authEmail" type="email" autocomplete="email" placeholder="name@example.com"></div>
+<div class="field" style="margin:10px 0"><label for="authPassword">كلمة المرور</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="6 أحرف على الأقل"></div>
+<div class="toolbar"><button id="loginBtn">تسجيل الدخول</button><button id="registerBtn" class="secondary">إنشاء حساب</button><button id="resetBtn" class="secondary">نسيت كلمة المرور؟</button></div><p id="authMessage" class="status" role="status"></p></section>
+<div id="appRoot" hidden><header><h1>دفتر درجاتي</h1><div>إدارة درجات الطلاب وحساب الشفهي والتحريري والنتيجة الشهرية والسعي</div></header>
+<div class="wrap">
+<section id="adminPanel" class="panel no-print" hidden><h3>لوحة الأدمن</h3><p class="small">قائمة حسابات المدرّسين المسجّلة. هذه اللوحة للعرض فقط ولا تعدّل درجاتهم.</p><div class="toolbar"><button id="refreshTeachers" type="button">تحديث القائمة</button><span id="adminStatus" class="status">بانتظار التحقق من صلاحية الأدمن</span></div><div class="table-wrap"><table id="teachersTable" style="min-width:500px"><thead><tr><th>البريد الإلكتروني</th><th>آخر تحديث</th></tr></thead><tbody><tr><td colspan="2">لم تُحمّل القائمة بعد.</td></tr></tbody></table></div></section>
+<section class="panel no-print"><h3>إعدادات الدفتر</h3><div class="row">
+<div class="field"><label>اسم المدرسة</label><input id="school" placeholder="اسم المدرسة"></div><div class="field"><label>اسم المدرّس</label><input id="teacher" placeholder="اسم المدرّس"></div><div class="field"><label>الصف / الشعبة</label><input id="grade" placeholder="السادس الابتدائي / أ"></div><div class="field"><label>الشهر</label><select id="month"><option>الشهر الأول</option><option>الشهر الثاني</option><option>الشهر الثالث</option><option>الشهر الرابع</option><option>الشهر الخامس</option><option>الشهر السادس</option></select></div></div><div class="toolbar"><button id="saveMeta">حفظ الإعدادات</button><span id="status" class="status">الحفظ محلي على هذا الجهاز</span></div><p class="small">تُحفظ البيانات على الجهاز، وتُزامن مع Firebase بعد تسجيل الدخول ونجاح الاتصال. نزّل نسخة احتياطية بانتظام.</p></section>
+<section class="panel no-print"><h3>إضافة حقل درجات</h3><div class="row"><div class="field"><label>اسم الحقل</label><input id="fieldName" placeholder="مثال: الواجب أو المشاركة"></div><div class="field"><label>نوع الحقل</label><select id="fieldType"><option value="oral">شفهي</option><option value="written">تحريري</option></select></div><button id="addField">إضافة الحقل</button></div><div id="fieldList" class="toolbar"></div></section>
+<section class="panel no-print"><h3>إدارة الطلاب</h3><div class="row"><div class="field"><label>اسم الطالب</label><input id="studentName" placeholder="الاسم الثلاثي"></div><button id="addStudent">إضافة طالب</button><button id="sort" class="secondary">ترتيب الأسماء</button></div><div class="toolbar"><button id="csv" class="secondary">تصدير CSV</button><button id="backup" class="secondary">تنزيل نسخة احتياطية</button><label class="secondary" style="padding:10px;border:1px solid #dce2ec;border-radius:8px">استيراد نسخة <input type="file" id="restore" accept=".json" style="width:150px;padding:3px"></label><button id="print" class="secondary">طباعة</button><button id="clear" class="danger">مسح كل البيانات</button></div></section>
+<section class="panel" id="insightsPanel"><h3>ملخص الدرجات والأوائل</h3><div class="stats-grid"><article class="stat-card"><span>عدد الطلاب</span><strong id="statStudents">0</strong><small>المسجلون في هذا الدفتر</small></article><article class="stat-card"><span>معدل الصف</span><strong id="statAverage">—</strong><small>حسب نتائج الشهر المحدد</small></article><article class="stat-card"><span>أعلى نتيجة</span><strong id="statTop">—</strong><small id="statTopName">لا توجد درجات بعد</small></article><article class="stat-card"><span>طلاب لديهم درجات</span><strong id="statGraded">0</strong><small>أُدخلت لهم درجة واحدة على الأقل</small></article></div><div class="rank-head"><div><h4>🏆 الأوائل لهذا الشهر</h4><p>الترتيب حسب النتيجة الشهرية، مع تجاهل الطلاب الذين لم تُدخل لهم درجات.</p></div><span class="rank-month" id="rankMonth">الشهر الأول</span></div><div class="table-wrap rank-wrap"><table id="rankTable"><thead><tr><th>الترتيب</th><th>اسم الطالب</th><th>الشفهي</th><th>التحريري</th><th>النتيجة</th></tr></thead><tbody><tr><td colspan="5">أدخل درجات الطلاب حتى يظهر الترتيب.</td></tr></tbody></table></div></section>
+<section class="panel"><h3>جدول الدرجات</h3><div id="info" class="small"></div><div class="table-wrap"><table id="tbl"><thead></thead><tbody></tbody></table></div><p class="small">النتيجة الشهرية = (مجموع الشفهي + مجموع التحريري) ÷ 2. السعي = متوسط نتيجة الشهر الأول والثاني، ويُقرّب لأقرب عدد صحيح.</p></section>
+</div></div>
+<script>
+(()=>{'use strict';const $=x=>document.getElementById(x),KEY='daftarDarajati_complete_v1';
+const blank=()=>({meta:{school:'',teacher:'',grade:'',month:'الشهر الأول'},fields:[],students:[],grades:{}});
+function norm(x){let d=blank();if(!x||typeof x!=='object')return d;d.meta={...d.meta,...(x.meta||{})};d.fields=Array.isArray(x.fields)?x.fields.filter(f=>f&&f.id&&f.name).map(f=>({id:String(f.id),name:String(f.name),type:f.type==='written'?'written':'oral'})):[];d.students=Array.isArray(x.students)?x.students.filter(s=>s&&s.id).map(s=>({id:String(s.id),name:String(s.name||'طالب')})):[];d.grades=x.grades&&typeof x.grades==='object'?x.grades:{};if(x.settings&&Array.isArray(x.settings.customFields)&&!d.fields.length)d.fields=x.settings.customFields.map((f,i)=>typeof f==='string'?{id:'legacy_'+i,name:f,type:'oral'}:{id:String(f.id||'legacy_'+i),name:String(f.name||f.label||'حقل '+(i+1)),type:f.type==='written'?'written':'oral'});if(x.rosters&&!d.students.length){let a=Object.values(x.rosters).find(Array.isArray)||[];d.students=a.map((s,i)=>typeof s==='string'?{id:'legacy_'+i,name:s}:{id:String(s.id||s.studentId||'legacy_'+i),name:String(s.name||s.fullName||'طالب')})}return d}
+let db;try{db=norm(JSON.parse(localStorage.getItem(KEY)||'null'))}catch(e){db=blank()}
+let save=()=>{localStorage.setItem(KEY,JSON.stringify(db));$('status').textContent='تم الحفظ على هذا الجهاز'},uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const gkey=(m,s)=>m+'|'+s,grade=(m,s,f)=>{let v=db.grades[gkey(m,s)]?.[f];return v===''||v==null?null:Number(v)},total=(m,s,t)=>db.fields.filter(f=>f.type===t).reduce((n,f)=>n+(grade(m,s,f.id)||0),0),final=(m,s)=>(total(m,s,'oral')+total(m,s,'written'))/2,effort=s=>($('month').value==='الشهر الأول'?'—':Math.round((final('الشهر الأول',s)+final('الشهر الثاني',s))/2)),fmt=n=>String(Math.round(n*100)/100);
+function renderInsights(){const m=$('month').value||'الشهر الأول';const ranked=db.students.map(s=>{const vals=db.fields.map(f=>grade(m,s.id,f.id)).filter(v=>v!==null&&Number.isFinite(v));return {s,oral:total(m,s.id,'oral'),written:total(m,s.id,'written'),score:final(m,s.id),has:vals.length>0}});const graded=ranked.filter(x=>x.has).sort((a,b)=>b.score-a.score||a.s.name.localeCompare(b.s.name,'ar'));$('statStudents').textContent=db.students.length;$('statGraded').textContent=graded.length;$('statAverage').textContent=graded.length?fmt(graded.reduce((n,x)=>n+x.score,0)/graded.length):'—';$('statTop').textContent=graded.length?fmt(graded[0].score):'—';$('statTopName').textContent=graded.length?graded[0].s.name:'لا توجد درجات بعد';$('rankMonth').textContent=m;$('rankTable').querySelector('tbody').innerHTML=graded.length?graded.slice(0,10).map((x,i)=>`<tr class="${i===0?'rank-first':i===1?'rank-second':i===2?'rank-third':''}"><td>${i<3?['🥇','🥈','🥉'][i]+' ':''}${i+1}</td><td class="name">${esc(x.s.name)}</td><td>${fmt(x.oral)}</td><td>${fmt(x.written)}</td><td class="rank-score">${fmt(x.score)}</td></tr>`).join(''):'<tr><td colspan="5">أدخل درجات الطلاب حتى يظهر الترتيب.</td></tr>'}
+function render(){['school','teacher','grade'].forEach(k=>$(k).value=db.meta[k]||'');$('month').value=db.meta.month||'الشهر الأول';renderFields();renderTable()}
+function renderFields(){$('fieldList').innerHTML=db.fields.length?db.fields.map(f=>`<span class="pill">${esc(f.name)} · ${f.type==='oral'?'شفهي':'تحريري'} <button class="secondary" data-rm="${esc(f.id)}">×</button></span>`).join(''):'<span class="small">ماكو حقول مضافة بعد.</span>';$('fieldList').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{if(!confirm('حذف الحقل ودرجاته؟'))return;let id=b.dataset.rm;db.fields=db.fields.filter(f=>f.id!==id);Object.values(db.grades).forEach(x=>delete x[id]);save();render()})}
+function renderTable(){let m=$('month').value;let h='<tr><th>#</th><th>اسم الطالب</th>'+db.fields.map(f=>`<th>${esc(f.name)}<br><span class="small">${f.type==='oral'?'شفهي':'تحريري'}</span></th>`).join('')+'<th class="oral">مجموع الشفهي</th><th class="written">مجموع التحريري</th><th class="final">النتيجة الشهرية</th><th>السعي</th><th class="no-print">إجراء</th></tr>';$('tbl').querySelector('thead').innerHTML=h;$('info').textContent=db.students.length+' طالب · '+m;
+$('tbl').querySelector('tbody').innerHTML=db.students.length?db.students.map((s,i)=>`<tr data-s="${esc(s.id)}"><td>${i+1}</td><td class="name">${esc(s.name)}</td>${db.fields.map(f=>`<td><input type="number" min="0" step="any" data-f="${esc(f.id)}" data-s="${esc(s.id)}" value="${grade(m,s.id,f.id)??''}"></td>`).join('')}<td class="oral" data-t="oral">${fmt(total(m,s.id,'oral'))}</td><td class="written" data-t="written">${fmt(total(m,s.id,'written'))}</td><td class="final" data-t="final">${fmt(final(m,s.id))}</td><td data-t="effort">${effort(s.id)}</td><td class="no-print"><button class="danger" data-del="${esc(s.id)}">حذف</button></td></tr>`).join(''):`<tr><td colspan="${db.fields.length+7}">أضف أسماء الطلاب حتى يظهر الجدول.</td></tr>`;
+$('tbl').querySelectorAll('[data-f]').forEach(inp=>inp.onchange=()=>{if(inp.value!==''&&Number(inp.value)<0){alert('الدرجة لا يمكن أن تكون سالبة');inp.value='';}let k=gkey(m,inp.dataset.s);db.grades[k]??={};if(inp.value==='')delete db.grades[k][inp.dataset.f];else db.grades[k][inp.dataset.f]=Number(inp.value);save();let tr=inp.closest('tr');tr.querySelector('[data-t="oral"]').textContent=fmt(total(m,inp.dataset.s,'oral'));tr.querySelector('[data-t="written"]').textContent=fmt(total(m,inp.dataset.s,'written'));tr.querySelector('[data-t="final"]').textContent=fmt(final(m,inp.dataset.s));tr.querySelector('[data-t="effort"]').textContent=effort(inp.dataset.s);renderInsights()});
+$('tbl').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{let id=b.dataset.del;if(!confirm('حذف الطالب وكل درجاته؟'))return;db.students=db.students.filter(s=>s.id!==id);Object.keys(db.grades).forEach(k=>{if(k.endsWith('|'+id))delete db.grades[k]});save();renderTable()});renderInsights()}
+$('saveMeta').onclick=()=>{['school','teacher','grade'].forEach(k=>db.meta[k]=$(k).value.trim());db.meta.month=$('month').value;save();renderTable()};$('month').onchange=()=>{db.meta.month=$('month').value;save();renderTable()};
+$('addField').onclick=()=>{let name=$('fieldName').value.trim();if(!name)return alert('اكتب اسم الحقل');if(db.fields.some(f=>f.name===name))return alert('الحقل موجود');db.fields.push({id:uid(),name,type:$('fieldType').value});$('fieldName').value='';save();render()};
+$('addStudent').onclick=()=>{let name=$('studentName').value.trim();if(!name)return alert('اكتب اسم الطالب');db.students.push({id:uid(),name});$('studentName').value='';save();renderTable()};$('sort').onclick=()=>{db.students.sort((a,b)=>a.name.localeCompare(b.name,'ar'));save();renderTable()};
+function dl(blob,name){let a=document.createElement('a'),u=URL.createObjectURL(blob);a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+$('backup').onclick=()=>dl(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),'دفتر-درجاتي-نسخة.json');
+$('restore').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let x=norm(JSON.parse(await f.text()));if(!confirm('استبدال البيانات الحالية بالنسخة؟'))return;db=x;save();render();alert('تم الاستيراد. تحقق من البيانات.')}catch(err){alert('ملف غير صالح')}e.target.value=''};
+$('csv').onclick=()=>{let m=$('month').value,rows=[['ت','اسم الطالب',...db.fields.map(f=>f.name+' '+(f.type==='oral'?'شفهي':'تحريري')),'مجموع الشفهي','مجموع التحريري','النتيجة الشهرية','السعي']];db.students.forEach((s,i)=>rows.push([i+1,s.name,...db.fields.map(f=>grade(m,s.id,f.id)??''),total(m,s.id,'oral'),total(m,s.id,'written'),final(m,s.id),effort(s.id)]));dl(new Blob(['\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}),'درجات-'+m+'.csv')};
+$('print').onclick=()=>print();$('clear').onclick=()=>{if(confirm('مسح كل بيانات هذا الدفتر؟ نزّل نسخة احتياطية أولاً.')&&confirm('تأكيد أخير لمسح كل البيانات؟')){db=blank();save();render()}};
+const firebaseConfig={apiKey:'AIzaSyBRTvRGBdsZBQprCcuPTDeuVX-UePGyYXQ',authDomain:'daftar-darajati.firebaseapp.com',projectId:'daftar-darajati',storageBucket:'daftar-darajati.firebasestorage.app',messagingSenderId:'187711517936',appId:'1:187711517936:web:63b22637601a1ed6163e35'};
+let auth=null,cloud=null,currentUser=null,remoteReady=false,saveTimer=null,isAdmin=false;
+const authMsg=t=>{$('authMessage').textContent=t};
+function friendlyAuthError(e){return ({'auth/email-already-in-use':'هذا البريد مسجّل مسبقاً.','auth/invalid-email':'البريد الإلكتروني غير صحيح.','auth/weak-password':'كلمة المرور لازم تكون 6 أحرف على الأقل.','auth/invalid-credential':'البريد أو كلمة المرور غير صحيحة.','auth/network-request-failed':'تحقق من اتصال الإنترنت.','auth/too-many-requests':'محاولات كثيرة؛ انتظر شوي وحاول مرة ثانية.','auth/unauthorized-domain':'أضف عنوان الموقع إلى Authorized domains في Firebase.','auth/operation-not-allowed':'فعّل تسجيل الدخول بالبريد وكلمة المرور من Firebase.'})[e.code]||('تعذّر إكمال العملية: '+(e.message||'خطأ غير معروف'))}
+$('loginBtn').onclick=async()=>{if(!auth){authMsg('خدمة تسجيل الدخول غير مهيأة.');return}const email=$('authEmail').value.trim(),password=$('authPassword').value;if(!email||!password){authMsg('اكتب البريد الإلكتروني وكلمة المرور.');return}authMsg('جارٍ تسجيل الدخول...');try{await auth.signInWithEmailAndPassword(email,password)}catch(e){authMsg(friendlyAuthError(e))}};
+$('registerBtn').onclick=async()=>{if(!auth){authMsg('خدمة تسجيل الدخول غير مهيأة.');return}const email=$('authEmail').value.trim(),password=$('authPassword').value;if(!email||password.length<6){authMsg('اكتب بريد صحيح وكلمة مرور من 6 أحرف على الأقل.');return}authMsg('جارٍ إنشاء الحساب...');try{await auth.createUserWithEmailAndPassword(email,password)}catch(e){authMsg(friendlyAuthError(e))}};
+$('resetBtn').onclick=async()=>{const email=$('authEmail').value.trim();if(!email){authMsg('اكتب بريدك الإلكتروني أولاً.');return}try{await auth.sendPasswordResetEmail(email);authMsg('إذا البريد مسجّل، راح توصلك رسالة استعادة كلمة المرور.')}catch(e){authMsg(friendlyAuthError(e))}};
+const originalSave=save;save=()=>{localStorage.setItem(KEY,JSON.stringify(db));$('status').textContent=currentUser&&remoteReady?'جارٍ حفظ التغييرات سحابياً...':'تم الحفظ على هذا الجهاز';if(currentUser&&cloud&&remoteReady){clearTimeout(saveTimer);saveTimer=setTimeout(async()=>{try{await cloud.collection('teachers').doc(currentUser.uid).set({email:currentUser.email||'',data:db,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});$('status').textContent='تم الحفظ على الجهاز والسحابة ✓'}catch(e){console.error(e);$('status').textContent='حُفظ محلياً، لكن فشل الحفظ السحابي'}},600)}};
+try{firebase.initializeApp(firebaseConfig);auth=firebase.auth();cloud=firebase.firestore()}catch(e){console.error(e);authMsg('تعذّر تهيئة Firebase.')}
+const signout=document.createElement('button');signout.textContent='تسجيل الخروج';signout.className='secondary no-print';signout.style.margin='10px';signout.onclick=async()=>{remoteReady=false;if(auth)await auth.signOut()};document.querySelector('header').appendChild(signout);
+const badge=document.createElement('span');badge.id='roleBadge';badge.className='pill';badge.style.margin='8px';badge.textContent='الحساب';document.querySelector('header').appendChild(badge);
+async function loadTeachers(){
+ const status=$('adminStatus'),body=$('teachersTable').querySelector('tbody');
+ status.textContent='جارٍ تحميل قائمة المدرّسين...';
+ try{const snap=await cloud.collection('teachers').get();
+  if(snap.empty){body.innerHTML='<tr><td colspan="2">ماكو حسابات مدرسين محفوظة حالياً.</td></tr>';}
+  else{body.innerHTML=snap.docs.map(doc=>{const d=doc.data()||{};let updated='—';try{if(d.updatedAt&&d.updatedAt.toDate)updated=d.updatedAt.toDate().toLocaleString('ar-IQ')}catch(_){};return '<tr><td>'+esc(d.email||'بدون بريد')+'</td><td>'+esc(updated)+'</td></tr>'}).join('');}
+  status.textContent='تم تحميل '+snap.size+' حساب/حسابات.';
+ }catch(e){console.error('Admin teachers list error:',e);body.innerHTML='<tr><td colspan="2">تعذّر تحميل القائمة. تحقق من قواعد Firestore.</td></tr>';status.textContent='فشل التحميل: '+(e.code||e.message||'خطأ غير معروف');}
+}
+$('refreshTeachers').onclick=()=>{if(isAdmin)loadTeachers()};
+if(auth)auth.onAuthStateChanged(async user=>{
+ currentUser=user;remoteReady=false;isAdmin=false;$('adminPanel').hidden=true;$('roleBadge').textContent='الحساب';
+ if(!user){$('authScreen').hidden=false;$('appRoot').hidden=true;return}
+ $('authScreen').hidden=true;$('appRoot').hidden=false;$('status').textContent='جارٍ تحميل بيانات حسابك...';
+ try{
+  // صلاحية الأدمن تُقرأ من admins/{uid} وفق إعداد قاعدة البيانات.
+  const adminDoc=await cloud.collection('admins').doc(user.uid).get();
+  isAdmin=adminDoc.exists&&adminDoc.data().role==='admin';
+  $('roleBadge').textContent=isAdmin?'الأدمن':'حساب مدرس';
+  $('adminPanel').hidden=!isAdmin;
+  const ref=cloud.collection('teachers').doc(user.uid),snap=await ref.get();
+  if(snap.exists&&snap.data().data){db=norm(snap.data().data);localStorage.setItem(KEY,JSON.stringify(db));}
+  else{
+   const local=localStorage.getItem(KEY);
+   if(local){const localData=norm(JSON.parse(local));if(localData.students.length||localData.fields.length||Object.keys(localData.grades).length)db=localData;}
+   await ref.set({email:user.email||'',data:db,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+  }
+  remoteReady=true;render();$('status').textContent='تم تحميل بيانات حسابك من السحابة ✓';
+  if(isAdmin)await loadTeachers();
+ }catch(e){console.error('Account load error:',e);$('status').textContent='تعذّر تحميل السحابة: '+(e.code||e.message||'تحقق من الاتصال والصلاحيات');remoteReady=false;}
+});
+render();
+})();
+</script></body></html>
