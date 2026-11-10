@@ -336,7 +336,90 @@ if(auth)auth.onAuthStateChanged(async user=>{
 });
 render();
 })();
-</script></body></html>
+</script>
+<style>
+/* Dashboard polish: clearer hierarchy, spacious cards and responsive workspace */
+:root{
+ --dash-bg:#f5f2fa;--dash-card:#fff;--dash-ink:#261936;--dash-muted:#786b89;
+ --dash-line:#e9e1f1;--dash-purple:#552b86;--dash-purple-soft:#f2ebfa;
+ --dash-shadow:0 10px 30px rgba(49,25,76,.065)
+}
+body{background:linear-gradient(145deg,#f8f6fb 0%,#f1edf7 55%,#faf9fc 100%)!important;color:var(--dash-ink)!important}
+#appRoot>header{
+ display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"mark title actions" "mark subtitle actions" "mark badge actions";
+ align-items:center;column-gap:15px;row-gap:2px;padding:25px max(18px,calc((100% - 1320px)/2)) 28px!important;
+ background:linear-gradient(118deg,#28133f 0%,#48216f 52%,#7950a8 100%)!important;
+ border-radius:0 0 26px 26px!important;box-shadow:0 14px 32px #32164d24!important
+}
+#appRoot>header .brand-mark{grid-area:mark;width:58px;height:58px;display:grid;place-items:center;border:1px solid #ffffff38;border-radius:18px;background:#ffffff18;font-size:30px;box-shadow:inset 0 1px #ffffff24}
+#appRoot>header h1{grid-area:title;margin:0!important;font-size:clamp(25px,3vw,35px)!important;font-weight:900;line-height:1.3}
+#appRoot>header>div:not(.brand-mark){grid-area:subtitle;max-width:680px;color:#f0e8f8;font-size:13px;line-height:1.7}
+#appRoot>header #roleBadge{grid-area:badge;justify-self:start;margin:7px 0 0!important;background:#ffffff19!important;border:1px solid #ffffff42;color:#fff!important}
+#appRoot>header #roleBadge+button{grid-area:actions;align-self:center;justify-self:end;margin:0!important;padding:11px 17px!important;background:#fff!important;color:#4b247c!important;border:1px solid #ffffffa8!important;border-radius:13px!important;font-weight:800}
+#appRoot .wrap{
+ max-width:1320px!important;margin:24px auto 40px!important;padding:0 18px!important;
+ display:grid!important;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px!important;align-items:start
+}
+#appRoot .wrap>.panel{margin:0!important;min-width:0;padding:21px!important;border:1px solid var(--dash-line)!important;border-radius:19px!important;background:var(--dash-card)!important;box-shadow:var(--dash-shadow)!important}
+#appRoot .wrap>#accountPanel,#appRoot .wrap>#adminPanel,#appRoot .wrap>.panel:nth-of-type(3),
+#appRoot .wrap>#insightsPanel,#appRoot .wrap>#gradePanel{grid-column:1/-1}
+#appRoot .wrap>.panel:nth-of-type(4){grid-column:span 5}
+#appRoot .wrap>.panel:nth-of-type(5){grid-column:span 7}
+#appRoot .panel h3{display:flex;align-items:center;gap:10px;margin:0 0 17px!important;padding:0 0 13px!important;border-bottom:1px solid #f0eaf5!important;color:#43205f!important;font-size:17px!important;font-weight:900!important}
+#appRoot .panel h3:before{content:"";width:5px;height:22px;flex:none;border-radius:8px;background:linear-gradient(180deg,#9b78c8,#54277f)}
+#appRoot .row{gap:13px!important}
+#appRoot .field{gap:7px!important}
+#appRoot label{font-size:12px!important;font-weight:800!important;color:#655674!important}
+#appRoot input,#appRoot select{min-height:45px!important;border:1px solid #e5dced!important;border-radius:12px!important;background:#fdfbff!important;box-shadow:none!important}
+#appRoot input:focus,#appRoot select:focus{border-color:#9873bf!important;box-shadow:0 0 0 3px #8055ad18!important}
+#appRoot button{min-height:42px;border-radius:12px!important;font-weight:800!important;box-shadow:none!important}
+#appRoot button:not(.secondary):not(.danger){background:linear-gradient(120deg,#4b247c,#7952a8)!important}
+#appRoot button.secondary{background:#f5f0fa!important;color:#512b7a!important;border:1px solid #e7dcef!important}
+#appRoot button.danger{background:#fff2f2!important;color:#a32d3b!important;border:1px solid #f1d8dc!important}
+#appRoot .toolbar{gap:9px!important}
+#appRoot .status{border:1px solid #dcefe4!important;background:#eff9f2!important;color:#26734a!important;border-radius:11px!important}
+#appRoot .stats-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:11px!important;margin:2px 0 22px!important}
+#appRoot .stat-card{padding:16px 14px!important;border-radius:15px!important;border:1px solid #eae2f2!important;background:linear-gradient(145deg,#fff,#fbf9fd)!important;box-shadow:0 5px 16px #32164d08}
+#appRoot .stat-card span{font-size:12px!important;color:#766986!important}
+#appRoot .stat-card strong{font-size:clamp(22px,2.3vw,30px)!important;color:#51277d!important}
+#appRoot .rank-head{margin:18px 0 11px!important}
+#appRoot .rank-head h4{font-size:15px!important;color:#43205f!important}
+#appRoot .rank-month{border:1px solid #e6d9f1!important;background:#f5effa!important;color:#552b86!important}
+#appRoot .table-wrap{border:1px solid #e8e0ef!important;border-radius:14px!important;box-shadow:none!important}
+#appRoot table{border-collapse:separate!important;border-spacing:0!important}
+#appRoot th{background:#f4eff9!important;color:#543b6c!important;font-size:12px!important}
+#appRoot td{border-bottom:1px solid #f0eaf5!important}
+#appRoot .small{color:var(--dash-muted)!important;line-height:1.8}
+#authScreen{background:#fff!important;border:1px solid #e9e0f1!important;border-radius:24px!important;box-shadow:0 22px 65px #32164d17!important}
+#authScreen h2{font-weight:900!important;color:#3e1c60!important}
+#authScreen input{background:#fcfaff!important}
+@media(max-width:900px){
+ #appRoot .stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #appRoot .wrap>.panel:nth-of-type(4),#appRoot .wrap>.panel:nth-of-type(5){grid-column:1/-1}
+}
+@media(max-width:620px){
+ #appRoot>header{grid-template-columns:44px 1fr;grid-template-areas:"mark title" "mark subtitle" "badge badge" "actions actions";gap:4px 11px;padding:19px 14px 22px!important;border-radius:0 0 21px 21px!important}
+ #appRoot>header .brand-mark{width:44px;height:44px;border-radius:14px;font-size:24px}
+ #appRoot>header h1{font-size:24px!important}
+ #appRoot>header>div:not(.brand-mark){font-size:11px}
+ #appRoot>header #roleBadge{margin-top:9px!important}
+ #appRoot>header #roleBadge+button{justify-self:stretch;width:100%;margin-top:7px!important}
+ #appRoot .wrap{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important;margin:13px auto 25px!important;padding:0 10px!important}
+ #appRoot .wrap>.panel,#appRoot .wrap>.panel:nth-of-type(4),#appRoot .wrap>.panel:nth-of-type(5){grid-column:1/-1!important;padding:15px!important;border-radius:16px!important}
+ #appRoot .panel h3{font-size:15px!important;margin-bottom:13px!important;padding-bottom:10px!important}
+ #appRoot .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px!important}
+ #appRoot .stat-card{padding:13px 11px!important}
+ #appRoot .stat-card strong{font-size:25px!important}
+ #appRoot .toolbar{display:flex!important;flex-wrap:wrap}
+ #appRoot .toolbar button{flex:1 1 calc(50% - 8px);min-width:0;font-size:12px!important;padding:9px 8px!important}
+ #appRoot .table-wrap{max-height:58vh}
+ #appRoot #tbl{min-width:820px}
+ #authScreen{width:calc(100% - 24px)!important;margin:22px auto!important;padding:23px 17px!important;border-radius:20px!important}
+}
+@media(prefers-reduced-motion:reduce){#appRoot button{transition:none!important}}
+</style>
+
+</body></html>
 
 <style>
 @media(max-width:700px){
